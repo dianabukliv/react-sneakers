@@ -6,41 +6,50 @@ import Header from './components/Header'
 import Drawer from './components/Drawer'
 
 function App() {
-  const arr = [
-    {title: 'Мужские Кроссовки Nike Blazer Mid Suede',
-     price: '12999',
-     imageUrl: '/src/img/sneakers/card1.jpg'
-    },
-    {title: 'Мужские Кроссовки Nike Air Max 270',
-    price: '15999',
-    imageUrl: '/src/img/sneakers/card2.jpg'
-   }
-  ]
-  return ( <div className='wrapper clear'>
-      <Drawer />
-      <Header />
-    <div className='content p-40'>
-      <div className='d-flex align-center justify-between mb-40'>
-        <h1>Всі кросівки</h1>
-        <div className='search-block'>
-          <img src='/src/img/search.svg' />
-          <input placeholder='Пошук...' />
-      </div>
-      </div>
-    <div className='d-flex'>
-      {arr.map((obj) => (
-        <Card 
-        title={obj.title} 
-        price={obj.price} 
-        imageUrl={obj.imageUrl}
-        onClick={() => console.log(obj)}
-        />
-  ))}
-    </div>
+  const [items, setItems] = React.useState([]);
+  const [cartItems, setCartItems] = React.useState([]);
+  const [cartOpened, setCartOpened] = React.useState(false);
 
-  </div>
-  </div>
-  )
+  React.useEffect(() => {
+    fetch('https://661b95e465444945d04fd073.mockapi.io/items')
+    .then((res) => {
+      return res.json();
+    })
+    .then((json) => {
+      setItems(json);
+    })
+  })
+const onAddToCart = (obj) => {
+  setCartItems(prev => [...prev, obj]);
+}
+  return (
+    <div className='wrapper clear'>
+      {cartOpened ? <Drawer items={cartItems} onClose={() => setCartOpened(false)}/> : null}
+      <Header onClickCart={() => setCartOpened(true)} />
+      <div className='content p-40'>
+        <div className='d-flex align-center justify-between mb-40'>
+          <h1>Всі кросівки</h1>
+          <div className='search-block'>
+            <img src='/src/img/search.svg' />
+            <input placeholder='Пошук...' />
+          </div>
+        </div>
+        <div className='d-flex flex-wrap'>
+          {items.map((item, index) => (
+            <Card
+              key={index} 
+              title={item.title}
+              price={item.price}
+              imageUrl={item.imageUrl}
+              onFavorite={() => console.log(obj)}
+              onPlus={(obj) => onAddToCart(obj)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default App;
+
